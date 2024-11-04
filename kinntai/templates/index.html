@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>勤怠管理システム</title>
+</head>
+<body>
+    <h1>勤怠管理システム</h1>
+    <form action="/punch" method="POST">
+        <label for="name">名前を選択:</label>
+        <select name="name" id="name">
+            {% for name in names %}
+            <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <label for="action">操作を選択:</label>
+        <select name="action" id="action">
+            <option value="出勤">出勤</option>
+            <option value="退勤">退勤</option>
+            <option value="休憩開始">休憩開始</option>
+            <option value="休憩終了">休憩終了</option>
+        </select>
+        <br><br>
+        <button type="submit">打刻</button>
+    </form>
+</body>
+</html>

@@ -9,5 +9,7 @@
     "data_count": 5,
     "use_latest_file": true,
 
-    "select_manual_file": false
+    "select_manual_file": false,
+
+    "select_outlier" : true
 }

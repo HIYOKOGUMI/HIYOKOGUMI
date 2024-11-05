@@ -18,7 +18,7 @@ with open(CONFIG_PATH, 'r', encoding='utf-8') as file:
 # 必須設定を取得
 try:
     data_count = config["data_count"]  # 取得するデータ数
-    file_selection_mode_auto = config.get("file_selection_mode_auto", True)  # デフォルトは自動選択
+    fetch_product_file_selection_mode_auto = config.get("fetch_product_file_selection_mode_auto", True)  # デフォルトは自動選択
 except KeyError as e:
     print(f"Error: 設定 '{e.args[0]}' が categories.json に存在しません。")
     exit(1)
@@ -45,7 +45,7 @@ def get_latest_file(directory, pattern='*.csv'):
 
 # ファイルを選択する関数
 def select_file(directory):
-    if file_selection_mode_auto:
+    if fetch_product_file_selection_mode_auto:
         # 最新ファイルを自動選択
         return get_latest_file(directory)
     else:

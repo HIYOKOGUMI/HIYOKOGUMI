@@ -6,6 +6,8 @@
     "max_pages": 1,
     "debug_mode": false,
 
-    "data_count": 5,
-    "file_selection_mode_auto": true
+    "data_count": 2,
+    "fetch_product_file_selection_mode_auto": true,
+
+    "statistics_file_selection_mode_auto": true
 }

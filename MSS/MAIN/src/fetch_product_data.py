@@ -2,23 +2,23 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import time
 import os
 import glob
 import json
-import re
-from datetime import datetime  # 現在時刻取得のため
+from datetime import datetime
 
-# categories.jsonを読み込む
-with open('../config/categories.json', 'r', encoding='utf-8') as file:
+# 設定ファイルのパス
+CONFIG_PATH = '../config/categories.json'
+
+# categories.jsonを読み込み
+with open(CONFIG_PATH, 'r', encoding='utf-8') as file:
     config = json.load(file)
 
 # 必須設定を取得
 try:
     data_count = config["data_count"]  # 取得するデータ数
-    use_latest_file = config["use_latest_file"]  # 最新ファイルを使用するか
+    file_selection_mode_auto = config.get("file_selection_mode_auto", True)  # デフォルトは自動選択
 except KeyError as e:
     print(f"Error: 設定 '{e.args[0]}' が categories.json に存在しません。")
     exit(1)
@@ -29,107 +29,91 @@ options = webdriver.ChromeOptions()
 options.add_argument('--headless')
 driver = webdriver.Chrome(service=service, options=options)
 
-# ディレクトリを作成（存在しない場合に作成）
-output_folder = '../data/products'
-os.makedirs(output_folder, exist_ok=True)
+# ディレクトリの設定
+urls_folder = '../data/urls'
+products_folder = '../data/products'
+cleaned_folder = '../data/cleaned'
+os.makedirs(products_folder, exist_ok=True)
+os.makedirs(cleaned_folder, exist_ok=True)
 
-# 最新ファイルを参照するかどうかの条件分岐
-if use_latest_file:
-    # 最新のCSVファイルを取得
-    list_of_files = glob.glob('../data/urls/*.csv')
-    if not list_of_files:
-        print("Error: 'data' フォルダー内にCSVファイルが見つかりません。")
-        exit(1)
-    latest_file = max(list_of_files, key=os.path.getmtime)  # 最新のファイルを選択
-    input_file = latest_file
-    print(f"最新のCSVファイルを使用しています: {input_file}")
-else:
-    # ユーザーにファイル名を入力させる
-    input_file = input("元データのCSVファイルの名前を入力してください（拡張子なし）: ").strip()
-    if not input_file.endswith(".csv"):
-        input_file += ".csv"  # 拡張子がなければ追加
-    input_file = f'../data/urls/{input_file}'
+# 最新のCSVファイルを取得する関数
+def get_latest_file(directory, pattern='*.csv'):
+    files = sorted(glob.glob(os.path.join(directory, pattern)), key=os.path.getmtime)
+    if not files:
+        raise FileNotFoundError(f"No CSV files found in directory: {directory}")
+    return files[-1]  # 一番最後の項目（最も新しいファイル）を取得
 
-    # ファイルの存在確認
-    if not os.path.exists(input_file):
-        print(f"Error: ファイルが見つかりません - {input_file}")
-        exit(1)
-
-# 現在時刻を取得してフォーマット（yyyy_mm_dd_hh_mm）
-current_time = datetime.now().strftime("%Y_%m_%d_%H_%M")
-
-# 出力ファイル名の設定：outputの直後に現在時刻を追加
-input_filename = os.path.basename(input_file)  # 元のファイル名を取得
-output_filename = f"output_{current_time}_{input_filename}"
-output_file = os.path.join(output_folder, output_filename)
+# ファイルを選択する関数
+def select_file(directory):
+    if file_selection_mode_auto:
+        # 最新ファイルを自動選択
+        return get_latest_file(directory)
+    else:
+        # 手動でファイル名を入力
+        selected_file = input("元データのCSVファイルの名前を入力してください（拡張子なし）: ") + ".csv"
+        file_path = os.path.join(directory, selected_file)
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f"指定されたファイルが存在しません: {file_path}")
+        return file_path
 
 # 商品情報を取得する関数
-def extract_product_info(url, index):
+def extract_product_info(url, index, total):
     try:
+        # 進行状況を表示
+        progress = (index / total) * 100
+        print(f"{index}/{total}件目のデータを取得中 - 進捗: {progress:.2f}%")
+        
         driver.get(url)
         time.sleep(2)  # ページが完全に読み込まれるまで待機
 
-        # 商品名の取得
         name = driver.find_element(By.TAG_NAME, 'h1').text if driver.find_elements(By.TAG_NAME, 'h1') else "N/A"
-
-        # 金額の取得 (2つ目のspanを選択)
         price_element = driver.find_element(By.CSS_SELECTOR, 'div[data-testid="price"]')
         spans = price_element.find_elements(By.TAG_NAME, 'span')
-        if len(spans) > 1:
-            price = spans[1].text  # 2つ目のspanタグから金額を取得
-        else:
-            price = "N/A"
-
-        # 商品状態の取得
+        price = spans[1].text if len(spans) > 1 else "N/A"
         condition = driver.find_element(By.CSS_SELECTOR, 'span[data-testid="商品の状態"]').text if driver.find_elements(By.CSS_SELECTOR, 'span[data-testid="商品の状態"]') else "N/A"
+        posted_date = next((p.text for p in driver.find_elements(By.CSS_SELECTOR, 'p.merText.body__5616e150.secondary__5616e150') if "前" in p.text), "日付情報なし")
 
-        # 日付に関する文字列の取得（「前」を含む<p>要素を検索）
-        posted_date = "日付情報なし"
-        p_elements = driver.find_elements(By.CSS_SELECTOR, 'p.merText.body__5616e150.secondary__5616e150')
-        for p in p_elements:
-            if "前" in p.text:  # 「前」という文字が含まれているかをチェック
-                posted_date = p.text
-                break
-
-        print(f"商品名: {name}")
-        print(f"価格: {price}")
-        print(f"商品の状態: {condition}")
-        print(f"掲載日: {posted_date}")
-        print(f"URL: {url}")
-
-        return {
-            'index': index,
-            'name': name,
-            'price': price,
-            'condition': condition,
-            'posted_date': posted_date,
-            'url': url  # URLをカラムに追加
-        }
+        return {'index': index, 'name': name, 'price': price, 'condition': condition, 'posted_date': posted_date, 'url': url}
 
     except Exception as e:
         print(f"Error processing URL {url}: {e}")
-        return {
-            'index': index,
-            'name': 'エラー',
-            'price': 'エラー',
-            'condition': 'エラー',
-            'posted_date': '日付情報なし',
-            'url': url  # URLをエラー時にも追加
-        }
+        return {'index': index, 'name': 'エラー', 'price': 'エラー', 'condition': 'エラー', 'posted_date': '日付情報なし', 'url': url}
 
-# CSVファイルを読み込む
+# URLファイルの選択
+input_file = select_file(urls_folder)
 df = pd.read_csv(input_file)
-
-# 指定されたデータ数に基づいて商品情報を取得
 urls = df['商品URL'].head(data_count)
-data = []
+total_urls = len(urls)
+data = [extract_product_info(url, i + 1, total_urls) for i, url in enumerate(urls)]
 
-for i, url in enumerate(urls):
-    data.append(extract_product_info(url, i + 1))  # インデックス番号を追加
-
-# データをCSVとして保存
+# 商品情報をCSVに保存
+current_time = datetime.now().strftime("%Y_%m_%d_%H_%M")
+input_filename = os.path.basename(input_file)  # 元のファイル名を取得
+output_file = os.path.join(products_folder, f"output_{current_time}_{input_filename}")
 product_df = pd.DataFrame(data)
 product_df.to_csv(output_file, index=False)
-
-print(f"商品情報のCSVファイルを作成しました: {output_file}")
 driver.quit()
+print(f"商品情報のCSVファイルを作成しました: {output_file}")
+
+# 異常値検出
+def detect_outliers(data):
+    data['price'] = pd.to_numeric(data['price'].str.replace(',', ''), errors='coerce')
+    def flag_outliers(group):
+        Q1, Q3 = group['price'].quantile(0.25), group['price'].quantile(0.75)
+        IQR = Q3 - Q1
+        group['outlier_flag'] = (group['price'] < Q1 - 1.5 * IQR) | (group['price'] > Q3 + 1.5 * IQR)
+        return group
+    
+    # グループ化と異常値フラグの追加後、conditionカラムを元のデータから再度追加
+    result = data.groupby('condition', group_keys=False).apply(flag_outliers, include_groups=False)
+    result['condition'] = data['condition']  # グループ化後のデータにconditionカラムを再度追加
+
+    # カラムの順序をpriceの次にconditionが来るように指定
+    result = result[['index', 'name', 'price', 'condition', 'posted_date', 'url', 'outlier_flag']]
+    return result
+
+# 異常値を検出し結果を保存
+product_data = detect_outliers(product_df)
+outlier_output_file = os.path.join(cleaned_folder, f"cleaned_{current_time}_{input_filename}")
+product_data.to_csv(outlier_output_file, index=False)
+print(f"異常値検出後のファイルを保存しました: {outlier_output_file}")

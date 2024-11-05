@@ -40,6 +40,9 @@ input_file_path = os.path.join(cleaned_dir, latest_file)
 output_file_name = latest_file.replace('cleaned', 'statistics').replace('.csv', '.xlsx')
 output_file_path = os.path.join(statistics_dir, output_file_name)
 
+# 中央値のCSV出力ファイルのパスを設定
+median_output_file_path = output_file_path.replace('.xlsx', '_median.csv')
+
 # データの読み込み
 data = pd.read_csv(input_file_path)
 
@@ -48,18 +51,24 @@ filtered_data = data[data['outlier_flag'] == False]
 
 # 条件ごとの集計
 results = {}
+median_data = []
+
 for condition, group in filtered_data.groupby('condition'):
     top_5_max = group.nlargest(5, 'price')
     top_5_min = group.nsmallest(5, 'price')
     median_price = group['price'].median()
     mean_price = group['price'].mean()
 
+    # 集計結果を辞書に保存
     results[condition] = {
         'top_5_max': top_5_max[['name', 'price', 'condition', 'posted_date', 'url']],
         'top_5_min': top_5_min[['name', 'price', 'condition', 'posted_date', 'url']],
         'median': median_price,
         'mean': mean_price
     }
+
+    # 中央値データをリストに追加
+    median_data.append({'condition': condition, 'median_price': median_price})
 
 # エラーURLの収集
 error_urls = data[data['outlier_flag'] == True][['url']]
@@ -90,4 +99,9 @@ with pd.ExcelWriter(output_file_path) as writer:
     # エラーシート
     error_urls.to_excel(writer, sheet_name="エラー", index=False)
 
+# 中央値データをCSVファイルとして保存
+median_df = pd.DataFrame(median_data)
+median_df.to_csv(median_output_file_path, index=False, encoding='utf-8-sig')
+
 print(f"処理が完了しました。結果は {output_file_path} に保存されています。")
+print(f"状態別の中央値は {median_output_file_path} に保存されています。")

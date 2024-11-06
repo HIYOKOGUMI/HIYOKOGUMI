@@ -1,13 +1,16 @@
 {
-    "main_category": "テレビ・オーディオ・カメラ",
-    "sub_category": "カメラ",
-    "sub_sub_category": "レンズ(ズーム)",
-    "search_keyword": "EF M 18-55mm f3.5-5.6",
-    "max_pages": 3,
+    "main_category": "車・バイク・自転車",
+    "sub_category": "自転車",
+    "sub_sub_category": "パーツ",
+    "search_keyword": "SRAM red etap セット",
+    "max_pages": 12,
     "debug_mode": false,
 
-    "data_count": 360,
+    "data_count": 1080,
     "fetch_product_file_selection_mode_auto": true,
 
-    "statistics_file_selection_mode_auto": false
+    "statistics_file_selection_mode_auto": false,
+
+    "generate_distribution_chart_file_selection_mode_auto": true
+
 }

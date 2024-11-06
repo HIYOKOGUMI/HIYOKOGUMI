@@ -109,7 +109,7 @@ with pd.ExcelWriter(output_file_path) as writer:
     error_urls.to_excel(writer, sheet_name="エラー", index=False)
 
 # 割引率の設定（20%、25%、30%、35%、40%）
-discount_rates = [0.20, 0.25, 0.30, 0.35, 0.40]
+discount_rates = [0.02, 0.03, 0.05, 0.1, 0.15]
 
 # 割引データの作成
 discount_data = []

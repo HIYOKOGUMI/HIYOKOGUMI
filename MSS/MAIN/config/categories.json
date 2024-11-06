@@ -9,5 +9,5 @@
     "data_count": 360,
     "fetch_product_file_selection_mode_auto": true,
 
-    "statistics_file_selection_mode_auto": true
+    "statistics_file_selection_mode_auto": false
 }

@@ -9,9 +9,9 @@ import json
 from datetime import datetime
 
 # 設定ファイルのパス
-CONFIG_PATH = '../config/setting.json'
+CONFIG_PATH = '../../config/MSS_setting.json'
 
-# categories.jsonを読み込み
+# MSS_setting.jsonを読み込み
 with open(CONFIG_PATH, 'r', encoding='utf-8') as file:
     config = json.load(file)
 
@@ -20,7 +20,7 @@ try:
     data_count = config["data_count"]  # 取得するデータ数
     fetch_product_file_selection_mode_auto = config.get("fetch_product_file_selection_mode_auto", True)  # デフォルトは自動選択
 except KeyError as e:
-    print(f"Error: 設定 '{e.args[0]}' が setting.json に存在しません。")
+    print(f"Error: 設定 '{e.args[0]}' が MSS_setting.json に存在しません。")
     exit(1)
 
 # ChromeDriverのパスを指定
@@ -30,9 +30,11 @@ options.add_argument('--headless')
 driver = webdriver.Chrome(service=service, options=options)
 
 # ディレクトリの設定
-urls_folder = '../_data/urls'
-products_folder = '../_data/products'
+urls_folder = '../data/urls'
+products_folder = '../data/products'
+cleaned_folder = '../data/cleaned'
 os.makedirs(products_folder, exist_ok=True)
+os.makedirs(cleaned_folder, exist_ok=True)
 
 # 最新のCSVファイルを取得する関数
 def get_latest_file(directory, pattern='*.csv'):
@@ -92,3 +94,26 @@ product_df = pd.DataFrame(data)
 product_df.to_csv(output_file, index=False)
 driver.quit()
 print(f"商品情報のCSVファイルを作成しました: {output_file}")
+
+# 異常値検出
+def detect_outliers(data):
+    data['price'] = pd.to_numeric(data['price'].str.replace(',', ''), errors='coerce')
+    def flag_outliers(group):
+        Q1, Q3 = group['price'].quantile(0.25), group['price'].quantile(0.75)
+        IQR = Q3 - Q1
+        group['outlier_flag'] = (group['price'] < Q1 - 1.5 * IQR) | (group['price'] > Q3 + 1.5 * IQR)
+        return group
+    
+    # グループ化と異常値フラグの追加後、conditionカラムを元のデータから再度追加
+    result = data.groupby('condition', group_keys=False).apply(flag_outliers, include_groups=False)
+    result['condition'] = data['condition']  # グループ化後のデータにconditionカラムを再度追加
+
+    # カラムの順序をpriceの次にconditionが来るように指定
+    result = result[['index', 'name', 'price', 'condition', 'posted_date', 'url', 'outlier_flag']]
+    return result
+
+# 異常値を検出し結果を保存
+product_data = detect_outliers(product_df)
+outlier_output_file = os.path.join(cleaned_folder, f"cleaned_{current_time}_{input_filename}")
+product_data.to_csv(outlier_output_file, index=False)
+print(f"異常値検出後のファイルを保存しました: {outlier_output_file}")

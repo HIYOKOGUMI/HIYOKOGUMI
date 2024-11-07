@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 
 # JSONファイルからカテゴリー、検索キーワード、ページ数、デバッグモードを読み込む
-with open('../config/setting.json', 'r', encoding='utf-8') as file:
+with open('../../config/MSS_setting.json', 'r', encoding='utf-8') as file:
 
     data = json.load(file)
     main_category = data["main_category"]
@@ -102,7 +102,7 @@ except Exception as e:
 
 # ステップ9: 「売り切れのみ」のチェックボックスをクリック
 try:
-    sold_out_checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@value='on_sale']")))
+    sold_out_checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@value='sold_out|trading']")))
     sold_out_checkbox.click()
     time.sleep(1)
 except Exception as e:
@@ -194,7 +194,7 @@ else:
 now = datetime.now().strftime('%Y_%m_%d_%H_%M')
 
 # ディレクトリを作成（存在しない場合のみ）
-output_dir = '../_data/urls'
+output_dir = '../data/urls'
 if not os.path.exists(output_dir):
     os.makedirs(output_dir, exist_ok=True)
 

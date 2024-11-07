@@ -4,8 +4,8 @@ import glob
 import os
 import json
 
-# categories.jsonの読み込み
-with open('../config/categories.json', 'r', encoding='utf-8') as f:
+# MSS_setting.jsonの読み込み
+with open('../../config/MSS_setting.json', 'r', encoding='utf-8') as f:
     config = json.load(f)
 
 # ファイル参照モードの設定に基づくファイルの決定

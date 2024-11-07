@@ -3,13 +3,13 @@
     "sub_category": "自転車",
     "sub_sub_category": "パーツ",
     "search_keyword": "SRAM red etap セット",
-    "max_pages": 12,
+    "max_pages": 1,
     "debug_mode": false,
 
-    "data_count": 1080,
+    "data_count": 3,
     "fetch_product_file_selection_mode_auto": true,
 
-    "statistics_file_selection_mode_auto": false,
+    "statistics_file_selection_mode_auto": true,
 
     "generate_distribution_chart_file_selection_mode_auto": true
 

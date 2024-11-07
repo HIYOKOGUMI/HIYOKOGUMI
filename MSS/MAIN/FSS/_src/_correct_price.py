@@ -9,9 +9,9 @@ def get_latest_file(directory):
     return latest_file
 
 # ファイルパス設定
-statistics_dir = '../data/statistics'
-products_dir = '../_data/products'
-suggestion_base_dir = '../_data/suggestion'  # ベースの保存先ディレクトリ
+statistics_dir = '../../MSS/data/statistics'
+products_dir = '../_data/f_products'
+suggestion_base_dir = '../_data/f_suggestion'  # ベースの保存先ディレクトリ
 
 # 保存先ディレクトリが存在しなければ生成
 os.makedirs(suggestion_base_dir, exist_ok=True)

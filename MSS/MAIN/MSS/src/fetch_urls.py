@@ -13,11 +13,12 @@ from datetime import datetime
 
 # JSONファイルからカテゴリー、検索キーワード、ページ数、デバッグモードを読み込む
 with open('../../config/MSS_setting.json', 'r', encoding='utf-8') as file:
-
     data = json.load(file)
     main_category = data["main_category"]
     sub_category = data["sub_category"]
     sub_sub_category = data["sub_sub_category"]
+    sub_sub_sub_category = data.get("sub_sub_sub_category")  # 新たに追加
+    sub_sub_sub_sub_category = data.get("sub_sub_sub_sub_category")  # 新たに追加
     search_keyword = data["search_keyword"]
     max_pages = data["max_pages"]  # ページ数をJSONから取得
     debug_mode = data["debug_mode"]  # デバッグモードをJSONから取得
@@ -92,7 +93,24 @@ try:
 except Exception as e:
     print(f"Error selecting '{sub_sub_category}': {e}")
 
-# ステップ8: 販売状況の「絞り込み」ボタンをクリック
+# ステップ8: JSONから読み込んだサブサブサブカテゴリーを選択
+try:
+    sub_sub_sub_category_option = wait.until(EC.presence_of_element_located((By.XPATH, f"//option[text()='{sub_sub_sub_category}']")))
+    sub_sub_sub_category_option.click()
+    time.sleep(1)
+except Exception as e:
+    print(f"Error selecting '{sub_sub_sub_category}': {e}")
+
+# ステップ9: JSONから読み込んだサブサブサブサブカテゴリーがチェックボックスの場合
+try:
+    # 「すべて」というテキストを含むチェックボックスのラベルを取得しクリック
+    all_checkbox_label = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='すべて']/ancestor::label")))
+    all_checkbox_label.click()
+    time.sleep(1)
+except Exception as e:
+    print(f"Error selecting 'すべて' checkbox: {e}")
+
+# ステップ10: 販売状況の「絞り込み」ボタンをクリック
 try:
     sales_status_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='販売状況']//button[@id='accordion_button']")))
     sales_status_button.click()
@@ -100,7 +118,7 @@ try:
 except Exception as e:
     print(f"Error clicking '販売状況' accordion button: {e}")
 
-# ステップ9: 「売り切れのみ」のチェックボックスをクリック
+# ステップ11: 「売り切れのみ」のチェックボックスをクリック
 try:
     sold_out_checkbox = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@value='sold_out|trading']")))
     sold_out_checkbox.click()
@@ -108,7 +126,7 @@ try:
 except Exception as e:
     print(f"Error clicking '売り切れのみ' checkbox: {e}")
 
-# ステップ10: 検索ボックスに JSON から読み込んだキーワードを入力
+# ステップ12: 検索ボックスに JSON から読み込んだキーワードを入力
 try:
     search_box = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@aria-label='検索キーワードを入力']")))
     search_box.send_keys(search_keyword)  # JSONファイルから読み込み
@@ -116,7 +134,7 @@ try:
 except Exception as e:
     print(f"Error entering text into search box: {e}")
 
-# ステップ11: エンターキーを押して検索を実行
+# ステップ13: エンターキーを押して検索を実行
 try:
     search_box.send_keys(Keys.ENTER)
     time.sleep(3)

@@ -179,6 +179,28 @@ while page <= max_pages:  # JSONから取得したmax_pagesに従ってループ
         print("No more pages found or error clicking the next page button.")
         break
 
+# 指定ページ数分のURLを取得後に、総ページ数と最終ページのアイテム数を確認する処理
+total_pages = page  # 現在のページ数を記録
+
+# 最初のページのURL数を記録
+first_page_item_count = len(item_urls) if item_urls else 0
+
+while True:
+    try:
+        # 「次へ」ボタンが存在する場合はクリックしてページを進める
+        next_button = driver.find_element(By.XPATH, "//a[contains(text(), '次へ')]")
+        next_button.click()
+        time.sleep(3)  # ページが読み込まれるまで待機
+        total_pages += 1
+    except Exception:
+        print("全ページの確認が完了しました。")
+        
+        # 最終ページのアイテム数を取得
+        last_page_items = driver.find_elements(By.CLASS_NAME, "sc-bcd1c877-2.cvAXgx")
+        last_page_item_count = len(last_page_items)
+        print(f"最終ページのアイテム数: {last_page_item_count}")
+        break
+
 # デバッグモードでなければブラウザを自動で閉じる
 if not debug_mode:
     driver.quit()
@@ -203,5 +225,17 @@ file_path = os.path.join(output_dir, file_name)
 df = pd.DataFrame(item_urls, columns=['商品URL'])
 df.to_csv(file_path, index=False, encoding='utf-8-sig')
 
+# 推定総アイテム数の計算（最初のページのアイテム数 + (総ページ数 - 2) * 最初のページのアイテム数 + 最終ページのアイテム数）
+estimated_total_items = ((total_pages - 1) * (first_page_item_count // max_pages)) + last_page_item_count
+
+df['総ページ数'] = total_pages
+df['最終ページアイテム数'] = last_page_item_count
+df['推定総アイテム数'] = estimated_total_items
+
+# データフレームを再度CSVファイルに保存（既存ファイルに上書き）
+df.to_csv(file_path, index=False, encoding='utf-8-sig')
+print(f"総ページ数: {total_pages}、最終ページのアイテム数: {last_page_item_count}、推定総アイテム数: {estimated_total_items} が '{file_path}' に追加されました。")
+
 print(f"取得したURL数: {len(item_urls)}")
 print(f"データが '{file_path}' に保存されました。")
+print(first_page_item_count // max_pages)

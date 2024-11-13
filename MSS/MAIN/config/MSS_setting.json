@@ -10,6 +10,7 @@
     
     "data_count": 3,
     "fetch_product_file_selection_mode_auto": true,
+    "detect_outliers_file_selection_mode_auto": false,
     "statistics_file_selection_mode_auto": true,
     "generate_distribution_chart_file_selection_mode_auto": true
 }

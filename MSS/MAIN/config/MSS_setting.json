@@ -10,7 +10,13 @@
     
     "data_count": 3,
     "fetch_product_file_selection_mode_auto": true,
-    "detect_outliers_file_selection_mode_auto": false,
+
+    "detect_outliers_file_selection_mode_auto": true,
+    "detect_outliers_file_data_cleaning_mode": "range_based",
+    "コメント" : "IQR_based or range_based",
+    "detect_outliers_file_data_cleaning_mini": 85000,
+    "detect_outliers_file_data_cleaning_max": 250000,
+    
     "statistics_file_selection_mode_auto": true,
     "generate_distribution_chart_file_selection_mode_auto": true
 }

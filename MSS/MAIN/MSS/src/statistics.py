@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 import numpy as np
+import sys
 
 # ディレクトリの設定
 base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -108,8 +109,12 @@ with pd.ExcelWriter(output_file_path) as writer:
     # エラーシート
     error_urls.to_excel(writer, sheet_name="エラー", index=False)
 
-# 割引率の設定（20%、25%、30%、35%、40%）
-discount_rates = [0.02, 0.03, 0.05, 0.1, 0.15]
+# 割引率の設定を設定ファイルから取得、存在しない場合はエラーメッセージを表示して終了
+if "statistics_file_discount_rates" in config:
+    discount_rates = config["statistics_file_discount_rates"]
+else:
+    print("エラー: 設定ファイルに 'statistics_file_discount_rates' が見つかりません。")
+    sys.exit(1)  # スクリプトを終了
 
 # 割引データの作成
 discount_data = []

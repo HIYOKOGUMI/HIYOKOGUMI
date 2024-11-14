@@ -20,7 +20,10 @@ def load_webhook_url(filename="url.txt"):
 def send_message_to_google_chat(message):
     webhook_url = load_webhook_url()  # URLを読み込む
     headers = {"Content-Type": "application/json"}
-    payload = {"text": message}
+    
+    # メッセージ内の URL の後に改行を追加
+    modified_message = re.sub(r"(https?://\S+)", r"\1\n", message)
+    payload = {"text": modified_message}
     response = requests.post(webhook_url, headers=headers, data=json.dumps(payload))
     
     if response.status_code == 200:
@@ -68,7 +71,7 @@ if latest_file_name:
             # メッセージをGoogle Chatに送信
             send_message_to_google_chat(f"{sheet_name}シートの内容:\n{text_content}")
             
-            # リクエスト制限を回避するために5秒の待機時間を追加
+            # リクエスト制限を回避するために1秒の待機時間を追加
             time.sleep(1)
 else:
     print("最新の日付のファイルが見つかりませんでした。")

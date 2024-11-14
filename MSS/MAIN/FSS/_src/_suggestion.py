@@ -1,15 +1,46 @@
 import pandas as pd
 import os
+import re
+import json
 from datetime import datetime
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
 
-# 最新ファイルを取得する関数
-def get_latest_file(directory):
-    files = [os.path.join(directory, f) for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
-    latest_file = max(files, key=os.path.getmtime)
+# 設定ファイルのパス
+config_path = '../../config/FSS_setting.json'
+
+# 設定ファイルの読み込み
+with open(config_path, 'r', encoding='utf-8') as config_file:
+    config = json.load(config_file)
+suggestion_file_selection_mode_auto = config.get("suggestion_file_selection_mode_auto", True)
+
+# CSVファイルから日付と時刻が最新のファイルを取得する関数
+def get_latest_csv_by_date(directory, prefix):
+    pattern = re.compile(rf"{prefix}_(\d{{4}}_\d{{2}}_\d{{2}}_\d{{2}}_\d{{2}}).*\.csv$")
+    latest_file = None
+    latest_datetime = None
+    
+    for filename in os.listdir(directory):
+        match = pattern.search(filename)
+        if match:
+            file_datetime = datetime.strptime(match.group(1), "%Y_%m_%d_%H_%M")
+            if latest_datetime is None or file_datetime > latest_datetime:
+                latest_datetime = file_datetime
+                latest_file = os.path.join(directory, filename)
+    
+    if latest_file is None:
+        raise FileNotFoundError(f"{prefix} のCSVファイルが {directory} に見つかりませんでした。")
+    
     return latest_file
+
+# 指定されたファイルを取得する関数
+def get_file_by_name(directory, filename):
+    file_path = os.path.join(directory, filename)
+    if os.path.isfile(file_path):
+        return file_path
+    else:
+        raise FileNotFoundError(f"指定されたファイルが見つかりません: {filename}")
 
 # ファイルパス設定
 statistics_dir = '../../MSS/data/statistics'
@@ -19,9 +50,21 @@ suggestion_base_dir = '../_data/f_suggestion'  # 保存先ディレクトリ
 # 保存先ディレクトリが存在しなければ生成
 os.makedirs(suggestion_base_dir, exist_ok=True)
 
-# 最新のstatisticsファイルとproductsファイルを取得
-statistics_file = get_latest_file(statistics_dir)
-output_file = get_latest_file(products_dir)
+# ファイルの選択
+if suggestion_file_selection_mode_auto:
+    # 自動モードの場合、最新のCSVファイルを取得
+    statistics_file = get_latest_csv_by_date(statistics_dir, "statistics")
+    output_file = get_latest_csv_by_date(products_dir, "output")  # outputファイルのプレフィックスが "output" と仮定
+else:
+    # 手動モードの場合、ユーザーにファイル名を2回入力させる
+    statistics_input = input("参照する statistics ファイル名を入力してください: ")
+    output_input = input("参照する output ファイル名を入力してください: ")
+    statistics_file = get_file_by_name(statistics_dir, statistics_input)
+    output_file = get_file_by_name(products_dir, output_input)
+
+# デバッグログ出力
+print(f"参照された statistics ファイル: {statistics_file}")
+print(f"参照された output ファイル: {output_file}")
 
 # ファイル読み込み
 statistics_df = pd.read_csv(statistics_file, encoding='utf-8')
@@ -50,55 +93,48 @@ remaining_df = output_df[output_df['price'] >= 17857]
 # 各割合に基づいて分類し、データフレームをリストに追加
 dataframes = []
 for threshold in percentages:
-    # 各行に対して、状態ごとの基準値でフィルタ
     mask = remaining_df.apply(
         lambda row: row['price'] <= statistics_df[row['condition']].iloc[0] * (1 - threshold)
         if row['condition'] in condition_columns else False, axis=1
     )
     
-    # 条件に合う行を抽出してデータフレームに追加
     selected_df = remaining_df[mask]
     dataframes.append(selected_df)
     print(f"Data prepared for threshold: {threshold * 100}% with {selected_df.shape[0]} entries")
     
-    # 残りのデータから抽出された行を除外
     remaining_df = remaining_df[~mask]
 
 # データフレームをシートとして書き込み、セルの幅を調整
 def save_dataframes_to_excel_with_adjustment(dataframes, file_name=merged_file_name):
-    sheet_names = ["★", "★★", "★★★", "★★★★", "★★★★★"]  # シート名リスト
+    sheet_names = ["★", "★★", "★★★", "★★★★", "★★★★★"]
 
     with pd.ExcelWriter(file_name, engine='openpyxl') as writer:
         for i, df in enumerate(dataframes):
-            sheet_name = sheet_names[i]  # シート名を設定
+            sheet_name = sheet_names[i]
             df.to_excel(writer, sheet_name=sheet_name, index=False)
         
-        # 各シートの幅を調整し、URLセルをハイパーリンク化
         workbook = writer.book
         for i, df in enumerate(dataframes):
             worksheet = workbook[sheet_names[i]]
             for col in worksheet.columns:
                 max_length = 0
-                col_letter = get_column_letter(col[0].column)  # 列の文字番号を取得
+                col_letter = get_column_letter(col[0].column)
                 for cell in col:
                     try:
-                        # セルの内容の長さを取得して、最大値を更新
                         if len(str(cell.value)) > max_length:
                             max_length = len(str(cell.value))
                     except:
                         pass
-                    # URL列（例えばF列）をハイパーリンクとして設定
                     if col_letter == 'F' and cell.value and isinstance(cell.value, str) and cell.value.startswith("http"):
                         cell.hyperlink = cell.value
-                        cell.font = Font(color="0000FF", underline="single")  # ハイパーリンクの見た目に変更
+                        cell.font = Font(color="0000FF", underline="single")
 
-                # B列とD列は個別に幅を広げる
                 if col_letter == 'B':
-                    adjusted_width = max_length * 1.5  # B列は1.5倍の幅
+                    adjusted_width = max_length * 1.5
                 elif col_letter == 'D':
-                    adjusted_width = max_length * 2  # D列は2倍の幅
+                    adjusted_width = max_length * 2
                 else:
-                    adjusted_width = max_length + 2  # 他の列は通常の調整
+                    adjusted_width = max_length + 2
                 worksheet.column_dimensions[col_letter].width = adjusted_width
 
     print(f"File saved with adjusted column widths and clickable URLs as {file_name}")

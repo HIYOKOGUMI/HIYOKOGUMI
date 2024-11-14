@@ -17,7 +17,7 @@
     "detect_outliers_file_data_cleaning_mini": 85000,
     "detect_outliers_file_data_cleaning_max": 250000,
     
-    "statistics_file_selection_mode_auto": true,
-    "statistics_file_discount_rates": [0.02, 0.03, 0.05, 0.1, 0.15],
+    "statistics_file_selection_mode_auto": false,
+    "statistics_file_discount_rates": [0.05, 0.10, 0.15, 0.20, 0.25],
     "generate_distribution_chart_file_selection_mode_auto": true
 }

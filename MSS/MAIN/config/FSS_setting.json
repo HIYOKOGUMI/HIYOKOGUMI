@@ -10,5 +10,8 @@
 
     "data_count": 3,
     "fetch_product_file_selection_mode_auto": true,
-    "statistics_file_selection_mode_auto": true
+    
+    "suggestion_file_selection_mode_auto": true,
+
+    "send_to_gchat_file_selection_mode_auto": true
 }

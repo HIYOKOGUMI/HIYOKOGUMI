@@ -6,13 +6,13 @@
     "sub_sub_sub_sub_category": "",
     "search_keyword": "Barbour BEDALE",
     "max_pages": 1,
-    "debug_mode": true,
+    "debug_mode": false,
     
     "data_count": 3,
     "fetch_product_file_selection_mode_auto": true,
 
     "detect_outliers_file_selection_mode_auto": true,
-    "detect_outliers_file_data_cleaning_mode": "range_based",
+    "detect_outliers_file_data_cleaning_mode": "IQR_based",
     "コメント" : "IQR_based or range_based",
     "detect_outliers_file_data_cleaning_mini": 85000,
     "detect_outliers_file_data_cleaning_max": 250000,

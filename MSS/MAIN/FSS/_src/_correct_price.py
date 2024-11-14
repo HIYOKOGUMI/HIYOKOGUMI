@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 from datetime import datetime
+from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 
 # 最新ファイルを取得する関数
 def get_latest_file(directory):
@@ -40,11 +42,11 @@ os.makedirs(suggestion_dir, exist_ok=True)
 
 # ファイル名リストの生成
 file_names = [
-    os.path.join(suggestion_dir, "s.csv"),
-    os.path.join(suggestion_dir, "ss.csv"),
-    os.path.join(suggestion_dir, "sss.csv"),
-    os.path.join(suggestion_dir, "ssss.csv"),
-    os.path.join(suggestion_dir, "sssss.csv")
+    os.path.join(suggestion_dir, "s.xlsx"),
+    os.path.join(suggestion_dir, "ss.xlsx"),
+    os.path.join(suggestion_dir, "sss.xlsx"),
+    os.path.join(suggestion_dir, "ssss.xlsx"),
+    os.path.join(suggestion_dir, "sssss.xlsx")
 ]
 
 # デバッグ: 使用する割合を確認
@@ -66,8 +68,33 @@ for threshold, file_name in zip(percentages, file_names):
     
     # 条件に合う行を抽出してファイル保存
     selected_df = remaining_df[mask]
-    selected_df.to_csv(file_name, index=False)
+    selected_df.to_excel(file_name, index=False)  # 一旦Excelファイルとして保存
     print(f"File saved: {file_name} with {selected_df.shape[0]} entries")
     
     # 残りのデータから抽出された行を除外
     remaining_df = remaining_df[~mask]
+
+    # 列幅を自動調整（各列の最大文字列長に合わせる）
+    wb = load_workbook(file_name)
+    ws = wb.active
+
+    for col in ws.columns:
+        max_length = 0
+        col_letter = get_column_letter(col[0].column)  # 列の文字番号を取得
+        for cell in col:
+            try:
+                # セルの内容の長さを取得して、最大値を更新
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        # B列とD列は個別に幅を広げる
+        if col_letter == 'B':
+            adjusted_width = max_length * 1.7  # B列は1.5倍の幅
+        elif col_letter == 'D':
+            adjusted_width = max_length * 2  # D列は2倍の幅
+        else:
+            adjusted_width = max_length + 2  # 他の列は通常の調整
+        ws.column_dimensions[col_letter].width = adjusted_width
+
+    wb.save(file_name)  # 調整後のファイルを保存

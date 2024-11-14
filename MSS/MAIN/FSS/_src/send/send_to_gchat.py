@@ -11,7 +11,7 @@ directory_path = '../../_data/f_suggestion'
 config_path = '../../../config/FSS_setting.json'
 
 # Webhook URLの読み込み
-def load_webhook_url(filename="url.txt"):
+def load_webhook_url(filename="dev_url.txt"): #本番環境のときはurl.txtに変更、この設定はconfigファイルに移動予定
     with open(filename, "r") as file:
         url = file.readline().strip()
     return url

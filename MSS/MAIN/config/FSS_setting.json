@@ -5,10 +5,10 @@
     "sub_sub_sub_category": "",
     "sub_sub_sub_sub_category": "",
     "search_keyword": "barbour BEDALE",
-    "max_pages": 2,
+    "max_pages": 1,
     "debug_mode": false,
 
-    "data_count": 3,
+    "data_count": 120,
     "fetch_product_file_selection_mode_auto": true,
 
     "suggestion_file_selection_mode_auto": true,

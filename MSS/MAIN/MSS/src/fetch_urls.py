@@ -64,7 +64,7 @@ except Exception as e:
 try:
     category_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//li[@data-testid='category_id']//button[@id='accordion_button']")))
     category_button.click()
-    time.sleep(1)
+    time.sleep(2)
 except Exception as e:
     print(f"Error clicking category accordion button: {e}")
 
@@ -73,7 +73,7 @@ try:
     select_element = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "select__da4764db")))
     select = Select(select_element)
     select.select_by_visible_text(main_category)  # JSONファイルから読み込み
-    time.sleep(1)
+    time.sleep(2)
 except Exception as e:
     print(f"Error selecting '{main_category}': {e}")
 
@@ -81,7 +81,7 @@ except Exception as e:
 try:
     sub_category_option = wait.until(EC.presence_of_element_located((By.XPATH, f"//option[text()='{sub_category}']")))
     sub_category_option.click()
-    time.sleep(1)
+    time.sleep(2)
 except Exception as e:
     print(f"Error selecting '{sub_category}': {e}")
 
@@ -89,7 +89,7 @@ except Exception as e:
 try:
     sub_sub_category_option = wait.until(EC.presence_of_element_located((By.XPATH, f"//option[text()='{sub_sub_category}']")))
     sub_sub_category_option.click()
-    time.sleep(1)
+    time.sleep(2)
 except Exception as e:
     print(f"Error selecting '{sub_sub_category}': {e}")
 
@@ -97,7 +97,7 @@ except Exception as e:
 try:
     sub_sub_sub_category_option = wait.until(EC.presence_of_element_located((By.XPATH, f"//option[text()='{sub_sub_sub_category}']")))
     sub_sub_sub_category_option.click()
-    time.sleep(1)
+    time.sleep(2)
 except Exception as e:
     print(f"Error selecting '{sub_sub_sub_category}': {e}")
 
@@ -106,7 +106,7 @@ try:
     # 「すべて」というテキストを含むチェックボックスのラベルを取得しクリック
     all_checkbox_label = wait.until(EC.element_to_be_clickable((By.XPATH, "//span[text()='すべて']/ancestor::label")))
     all_checkbox_label.click()
-    time.sleep(1)
+    time.sleep(2)
 except Exception as e:
     print(f"Error selecting 'すべて' checkbox: {e}")
 

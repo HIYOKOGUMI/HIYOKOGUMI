@@ -1,14 +1,14 @@
 {
-    "main_category": "ファッション",
-    "sub_category": "メンズ",
-    "sub_sub_category": "ジャケット・アウター",
-    "sub_sub_sub_category": "",
+    "main_category": "スマホ・タブレット・パソコン",
+    "sub_category": "PC周辺機器",
+    "sub_sub_category": "マウス・トラックボール",
+    "sub_sub_sub_category": "マウス本体",
     "sub_sub_sub_sub_category": "",
-    "search_keyword": "barbour BEDALE",
-    "max_pages": 1,
+    "search_keyword": "RAZER VIPER MINI SIGNATURE EDITION",
+    "max_pages": 9,
     "debug_mode": false,
     
-    "data_count": 120,
+    "data_count": 1080,
     "fetch_product_file_selection_mode_auto": true,
 
     "detect_outliers_file_selection_mode_auto": true,
@@ -18,6 +18,6 @@
     "detect_outliers_file_data_cleaning_max": 250000,
     
     "statistics_file_selection_mode_auto": true,
-    "statistics_file_discount_rates": [0.05, 0.10, 0.15, 0.20, 0.25],
+    "statistics_file_discount_rates": [0.02, 0.05, 0.10, 0.15, 0.20],
     "generate_distribution_chart_file_selection_mode_auto": true
 }

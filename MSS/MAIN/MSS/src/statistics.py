@@ -102,12 +102,20 @@ with pd.ExcelWriter(output_file_path) as writer:
                 median_df, pd.DataFrame(),  # 空行後にMedian
                 mean_df
             ], ignore_index=True)
+        else:
+            # 該当データがない場合は空のDataFrameを用意
+            condition_df = pd.DataFrame(columns=['name', 'price', 'condition', 'posted_date', 'url', 'Category'])
 
-            # シートに書き込み
-            condition_df.to_excel(writer, sheet_name=condition, index=False)
+        # シートに書き込み
+        condition_df.to_excel(writer, sheet_name=condition, index=False)
 
     # エラーシート
-    error_urls.to_excel(writer, sheet_name="エラー", index=False)
+    if not error_urls.empty:
+        error_urls.to_excel(writer, sheet_name="エラー", index=False)
+    else:
+        # エラーがない場合でもシートを作成
+        empty_error_df = pd.DataFrame(columns=['url'])
+        empty_error_df.to_excel(writer, sheet_name="エラー", index=False)
 
 # 割引率の設定を設定ファイルから取得、存在しない場合はエラーメッセージを表示して終了
 if "statistics_file_discount_rates" in config:
@@ -121,14 +129,26 @@ discount_data = []
 
 for rate in discount_rates:
     discount_row = {'割合': f'{int(rate * 100)}%'}
-    for condition, median_price in median_data.items():
+    for condition in condition_order:
+        # 各条件の中央値を取得し、存在しない場合は0を設定
+        median_price = median_data.get(condition, 0)
         # 割引価格を計算し、整数に丸め込み
         discount_price = round(median_price * (1 - rate))
         discount_row[condition] = discount_price
     discount_data.append(discount_row)
 
-# 割引データをDataFrameに変換し、指定のファイルに保存
+# 割引データをDataFrameに変換
 discount_df = pd.DataFrame(discount_data)
+
+# カラムが不足している場合、condition_orderに基づき調整
+missing_columns = [condition for condition in condition_order if condition not in discount_df.columns]
+for column in missing_columns:
+    discount_df[column] = 0  # 存在しないカラムには0を設定
+
+# カラム順を固定
+discount_df = discount_df[['割合'] + condition_order]
+
+# 指定のファイルに保存
 discount_df.to_csv(discount_output_file_path, index=False, encoding='utf-8-sig')
 
 print(f"処理が完了しました。結果は {output_file_path} に保存されています。")

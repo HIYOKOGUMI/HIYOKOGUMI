@@ -16,22 +16,32 @@ with open(config_path, 'r', encoding='utf-8') as config_file:
 suggestion_file_selection_mode_auto = config.get("suggestion_file_selection_mode_auto", True)
 
 # CSVファイルから日付と時刻が最新のファイルを取得する関数
-def get_latest_csv_by_date(directory, prefix):
-    pattern = re.compile(rf"{prefix}_(\d{{4}}_\d{{2}}_\d{{2}}_\d{{2}}_\d{{2}}).*\.csv$")
+def get_latest_csv_by_date(directory, prefixes):
+    # プレフィックスが複数ある場合を考慮して正規表現を作成
+    prefix_pattern = "|".join([re.escape(prefix) for prefix in prefixes])
+    # プレフィックス + 最初のタイムスタンプ + 任意の文字列 + .csv にマッチ
+    pattern = re.compile(rf"({prefix_pattern})(\d{{4}}_\d{{2}}_\d{{2}}_\d{{2}}_\d{{2}}).*\.csv$")
     latest_file = None
     latest_datetime = None
-    
+
+    # デバッグ用: 指定されたディレクトリとファイルを表示
+    print(f"Checking directory: {directory}")
+    print(f"Files in directory: {os.listdir(directory)}")
+
     for filename in os.listdir(directory):
+        print(f"Checking file: {filename}")  # デバッグ用
         match = pattern.search(filename)
         if match:
-            file_datetime = datetime.strptime(match.group(1), "%Y_%m_%d_%H_%M")
+            # 最初のタイムスタンプを抽出
+            file_datetime = datetime.strptime(match.group(2), "%Y_%m_%d_%H_%M")
+            print(f"Matched file: {filename}, extracted datetime: {file_datetime}")  # デバッグ用
             if latest_datetime is None or file_datetime > latest_datetime:
                 latest_datetime = file_datetime
                 latest_file = os.path.join(directory, filename)
-    
+
     if latest_file is None:
-        raise FileNotFoundError(f"{prefix} のCSVファイルが {directory} に見つかりませんでした。")
-    
+        raise FileNotFoundError(f"指定されたプレフィックスのCSVファイルが {directory} に見つかりませんでした。")
+
     return latest_file
 
 # 指定されたファイルを取得する関数
@@ -53,8 +63,8 @@ os.makedirs(suggestion_base_dir, exist_ok=True)
 # ファイルの選択
 if suggestion_file_selection_mode_auto:
     # 自動モードの場合、最新のCSVファイルを取得
-    statistics_file = get_latest_csv_by_date(statistics_dir, "statistics")
-    output_file = get_latest_csv_by_date(products_dir, "output")  # outputファイルのプレフィックスが "output" と仮定
+    statistics_file = get_latest_csv_by_date(statistics_dir, ["statistics_IQR_based_", "statistics_range_based_"])
+    output_file = get_latest_csv_by_date(products_dir, ["output_"])  # プレフィックスを正確に指定
 else:
     # 手動モードの場合、ユーザーにファイル名を2回入力させる
     statistics_input = input("参照する statistics ファイル名を入力してください: ")

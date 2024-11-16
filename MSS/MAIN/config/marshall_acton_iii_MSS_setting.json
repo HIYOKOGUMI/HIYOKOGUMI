@@ -1,0 +1,23 @@
+{
+    "main_category": "テレビ・オーディオ・カメラ",
+    "sub_category": "オーディオ機器",
+    "sub_sub_category": "スピーカー・ウーファー",
+    "sub_sub_sub_category": "",
+    "sub_sub_sub_sub_category": "",
+    "search_keyword": "marshall acton iii",
+    "max_pages": 9,
+    "debug_mode": false,
+    
+    "data_count": 1080,
+    "fetch_product_file_selection_mode_auto": true,
+
+    "detect_outliers_file_selection_mode_auto": true,
+    "detect_outliers_file_data_cleaning_mode": "IQR_based",
+    "コメント" : "IQR_based or range_based",
+    "detect_outliers_file_data_cleaning_mini": 85000,
+    "detect_outliers_file_data_cleaning_max": 250000,
+    
+    "statistics_file_selection_mode_auto": true,
+    "statistics_file_discount_rates": [0.02, 0.05, 0.10, 0.15, 0.20],
+    "generate_distribution_chart_file_selection_mode_auto": true
+}

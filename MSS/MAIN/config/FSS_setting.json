@@ -1,10 +1,11 @@
 {
     "main_category": "スマホ・タブレット・パソコン",
-    "sub_category": "PC周辺機器",
-    "sub_sub_category": "マウス・トラックボール",
-    "sub_sub_sub_category": "マウス本体",
+    "sub_category": "スマートフォン・携帯電話",
+    "sub_sub_category": "スマートフォン本体",
+    "sub_sub_sub_category": "",
     "sub_sub_sub_sub_category": "",
-    "search_keyword": "RAZER VIPER MINI SIGNATURE EDITION",
+    "brand":"アンドロイド",
+    "search_keyword": "aquos sense8",
     "max_pages": 9,
     "debug_mode": false,
 

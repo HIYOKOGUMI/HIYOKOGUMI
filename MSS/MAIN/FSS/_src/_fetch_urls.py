@@ -10,6 +10,7 @@ import time
 import pandas as pd
 import os
 from datetime import datetime
+from selenium.webdriver.common.action_chains import ActionChains
 
 # JSONファイルからカテゴリー、検索キーワード、ページ数、デバッグモードを読み込む
 with open('../../config/FSS_setting.json', 'r', encoding='utf-8') as file:
@@ -19,6 +20,7 @@ with open('../../config/FSS_setting.json', 'r', encoding='utf-8') as file:
     sub_sub_category = data["sub_sub_category"]
     sub_sub_sub_category = data.get("sub_sub_sub_category")  # 新たに追加
     sub_sub_sub_sub_category = data.get("sub_sub_sub_sub_category")  # 新たに追加
+    brand_name = data.get("brand", "")
     search_keyword = data["search_keyword"]
     max_pages = data["max_pages"]
     debug_mode = data["debug_mode"]
@@ -108,6 +110,62 @@ try:
     time.sleep(2)
 except Exception as e:
     print(f"Error selecting 'すべて' checkbox: {e}")
+
+# 初期値を設定（デベロッパーが手動で調整）
+offset_y = 50  # 入力フィールドからのオフセット（px）
+
+# ブランド選択処理
+try:
+    # ブランドのドロップダウンボタンをクリック
+    brand_dropdown_button = wait.until(
+        EC.element_to_be_clickable((By.XPATH, "//div[@data-testid='ブランド']//button[@id='accordion_button']"))
+    )
+    brand_dropdown_button.click()
+    time.sleep(2)
+
+    # ブランドの入力フィールドを取得して入力
+    brand_input = wait.until(
+        EC.presence_of_element_located((By.XPATH, "//input[@class='merInputNode' and @placeholder='入力してください']"))
+    )
+    brand_input.clear()
+    brand_input.send_keys(brand_name)  # JSONから取得したブランド名を入力
+    time.sleep(2)
+
+    # ハイライト表示用のJavaScriptコード
+    def highlight_click_position(x, y):
+        js_code = f"""
+        var marker = document.createElement('div');
+        marker.style.position = 'absolute';
+        marker.style.left = '{x}px';
+        marker.style.top = '{y}px';
+        marker.style.width = '10px';
+        marker.style.height = '10px';
+        marker.style.backgroundColor = 'red';
+        marker.style.border = '2px solid black';
+        marker.style.borderRadius = '50%';
+        marker.style.zIndex = '9999';
+        document.body.appendChild(marker);
+        setTimeout(() => marker.remove(), 2000);  // 2秒後にマーカーを削除
+        """
+        driver.execute_script(js_code)
+
+    # ブランド入力フィールドの位置を取得
+    input_location = brand_input.location
+    input_size = brand_input.size
+    click_x = input_location['x'] + input_size['width'] / 2
+    click_y = input_location['y'] + input_size['height'] + offset_y
+
+    # ハイライト表示
+    highlight_click_position(click_x, click_y)
+
+    # オフセットを使ってクリック
+    action = ActionChains(driver)
+    action.move_to_element_with_offset(brand_input, 0, offset_y).click().perform()
+    time.sleep(2)
+
+    print(f"入力フィールドから {offset_y}px 下をクリックしました。")
+except Exception as e:
+    print(f"ブランド選択中にエラーが発生しました: {e}")
 
 # ステップ10: 販売状況の「絞り込み」ボタンをクリック
 try:

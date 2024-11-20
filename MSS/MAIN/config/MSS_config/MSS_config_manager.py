@@ -25,7 +25,7 @@ default_data = OrderedDict([
 ])
 
 # プリセットファイルのパス
-preset_file = "presets.json"
+preset_file = "MSS_presets.json"
 
 # プリセットを読み込む
 def load_presets():

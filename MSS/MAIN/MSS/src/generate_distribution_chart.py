@@ -5,7 +5,7 @@ import os
 import json
 
 # MSS_setting.jsonの読み込み
-with open('../../config/MSS_setting.json', 'r', encoding='utf-8') as f:
+with open('../../config/MSS_config/MSS_setting.json', 'r', encoding='utf-8') as f:
     config = json.load(f)
 
 # ファイル参照モードの設定に基づくファイルの決定

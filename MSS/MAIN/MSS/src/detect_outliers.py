@@ -5,7 +5,7 @@ import json
 from datetime import datetime
 
 # 設定ファイルのパス
-CONFIG_PATH = '../../config/MSS_setting.json'
+CONFIG_PATH = '../../config/MSS_config/MSS_setting.json'
 
 # MSS_setting.jsonを読み込み
 with open(CONFIG_PATH, 'r', encoding='utf-8') as file:

@@ -5,16 +5,22 @@
     "sub_sub_sub_category": "",
     "sub_sub_sub_sub_category": "",
     "brand": "アンドロイド",
-    "search_keyword": "aquos sense8kokooko",
-    "max_pages": "1",
+    "search_keyword": "aquos sense8",
+    "max_pages": 1,
     "debug_mode": false,
-    "data_count": "3",
+    "data_count": 3,
     "fetch_product_file_selection_mode_auto": true,
     "detect_outliers_file_selection_mode_auto": true,
     "detect_outliers_file_data_cleaning_mode": "IQR_based",
-    "detect_outliers_file_data_cleaning_mini": "85000",
-    "detect_outliers_file_data_cleaning_max": "250000",
+    "detect_outliers_file_data_cleaning_mini": 0,
+    "detect_outliers_file_data_cleaning_max": 0,
     "statistics_file_selection_mode_auto": true,
-    "statistics_file_discount_rates": "0.02, 0.05, 0.1, 0.15, 0.2",
+    "statistics_file_discount_rates": [
+        0.02,
+        0.05,
+        0.1,
+        0.15,
+        0.2
+    ],
     "generate_distribution_chart_file_selection_mode_auto": true
 }

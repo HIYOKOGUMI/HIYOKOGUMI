@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 from selenium.webdriver.common.action_chains import ActionChains
 
-with open('../../config/MSS_setting.json', 'r', encoding='utf-8') as file:
+with open('../../config/MSS_config/MSS_setting.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
     main_category = data["main_category"]
     sub_category = data["sub_category"]

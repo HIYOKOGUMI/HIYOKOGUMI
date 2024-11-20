@@ -9,7 +9,7 @@ base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 data_dir = os.path.join(base_dir, 'data')
 cleaned_dir = os.path.join(data_dir, 'cleaned')
 statistics_dir = os.path.join(data_dir, 'statistics')
-config_file_path = os.path.abspath(os.path.join(base_dir, '..', 'config', 'MSS_setting.json'))
+config_file_path = os.path.abspath(os.path.join(base_dir, '..', 'config', 'MSS_config','MSS_setting.json'))
 
 # 統計ディレクトリが存在しない場合は作成
 if not os.path.exists(statistics_dir):

@@ -50,5 +50,57 @@
             0.2
         ],
         "generate_distribution_chart_file_selection_mode_auto": true
+    },
+    "バルミューダThe Speaker": {
+        "main_category": "テレビ・オーディオ・カメラ",
+        "sub_category": "オーディオ機器",
+        "sub_sub_category": "スピーカー・ウーファー",
+        "sub_sub_sub_category": "ワイヤレススピーカー",
+        "sub_sub_sub_sub_category": "",
+        "brand": "バルミューダ",
+        "search_keyword": "バルミューダThe Speaker",
+        "max_pages": 1,
+        "debug_mode": false,
+        "data_count": 3,
+        "fetch_product_file_selection_mode_auto": true,
+        "detect_outliers_file_selection_mode_auto": true,
+        "detect_outliers_file_data_cleaning_mode": "IQR_based",
+        "detect_outliers_file_data_cleaning_mini": 0,
+        "detect_outliers_file_data_cleaning_max": 0,
+        "statistics_file_selection_mode_auto": true,
+        "statistics_file_discount_rates": [
+            0.02,
+            0.05,
+            0.1,
+            0.15,
+            0.2
+        ],
+        "generate_distribution_chart_file_selection_mode_auto": true
+    },
+    "Barbour BEDALE ビデイル": {
+        "main_category": "ファッション",
+        "sub_category": "メンズ",
+        "sub_sub_category": "ジャケット・アウター",
+        "sub_sub_sub_category": "ジャンパー・ブルゾン",
+        "sub_sub_sub_sub_category": "",
+        "brand": "バブアー",
+        "search_keyword": "Barbour BEDALE ビデイル",
+        "max_pages": 1,
+        "debug_mode": false,
+        "data_count": 3,
+        "fetch_product_file_selection_mode_auto": true,
+        "detect_outliers_file_selection_mode_auto": true,
+        "detect_outliers_file_data_cleaning_mode": "IQR_based",
+        "detect_outliers_file_data_cleaning_mini": 0,
+        "detect_outliers_file_data_cleaning_max": 0,
+        "statistics_file_selection_mode_auto": true,
+        "statistics_file_discount_rates": [
+            0.02,
+            0.05,
+            0.1,
+            0.15,
+            0.2
+        ],
+        "generate_distribution_chart_file_selection_mode_auto": true
     }
 }

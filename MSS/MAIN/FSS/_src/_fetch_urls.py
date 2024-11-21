@@ -111,6 +111,7 @@ try:
 except Exception as e:
     print(f"Error selecting 'すべて' checkbox: {e}")
 
+'''
 # 初期値を設定（デベロッパーが手動で調整）
 offset_y = 50  # 入力フィールドからのオフセット（px）
 
@@ -166,6 +167,7 @@ try:
     print(f"入力フィールドから {offset_y}px 下をクリックしました。")
 except Exception as e:
     print(f"ブランド選択中にエラーが発生しました: {e}")
+'''
 
 # ステップ10: 販売状況の「絞り込み」ボタンをクリック
 try:

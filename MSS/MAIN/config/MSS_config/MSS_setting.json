@@ -1,11 +1,11 @@
 {
-    "main_category": "スマホ・タブレット・パソコン",
-    "sub_category": "スマートフォン・携帯電話",
-    "sub_sub_category": "スマートフォン本体",
-    "sub_sub_sub_category": "",
+    "main_category": "ファッション",
+    "sub_category": "メンズ",
+    "sub_sub_category": "ジャケット・アウター",
+    "sub_sub_sub_category": "ジャンパー・ブルゾン",
     "sub_sub_sub_sub_category": "",
-    "brand": "アンドロイド",
-    "search_keyword": "aquos sense8",
+    "brand": "バブアー",
+    "search_keyword": "Barbour BEDALE ビデイル",
     "max_pages": 9,
     "debug_mode": false,
     "data_count": 1080,
@@ -17,10 +17,10 @@
     "statistics_file_selection_mode_auto": true,
     "statistics_file_discount_rates": [
         0.02,
-        0.05,
         0.1,
         0.15,
-        0.2
+        0.2,
+        0.25
     ],
     "generate_distribution_chart_file_selection_mode_auto": true
 }

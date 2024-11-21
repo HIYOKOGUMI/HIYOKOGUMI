@@ -28,5 +28,35 @@
         "fetch_product_file_selection_mode_auto": true,
         "suggestion_file_selection_mode_auto": true,
         "send_to_gchat_file_selection_mode_auto": true
+    },
+    "バルミューダThe Speaker": {
+        "main_category": "テレビ・オーディオ・カメラ",
+        "sub_category": "オーディオ機器",
+        "sub_sub_category": "スピーカー・ウーファー",
+        "sub_sub_sub_category": "ワイヤレススピーカー",
+        "sub_sub_sub_sub_category": "",
+        "brand": "バルミューダ",
+        "search_keyword": "バルミューダThe Speaker",
+        "max_pages": 9,
+        "debug_mode": false,
+        "data_count": 1080,
+        "fetch_product_file_selection_mode_auto": true,
+        "suggestion_file_selection_mode_auto": true,
+        "send_to_gchat_file_selection_mode_auto": true
+    },
+    "Barbour BEDALE ビデイル": {
+        "main_category": "ファッション",
+        "sub_category": "メンズ",
+        "sub_sub_category": "ジャケット・アウター",
+        "sub_sub_sub_category": "ジャンパー・ブルゾン",
+        "sub_sub_sub_sub_category": "",
+        "brand": "",
+        "search_keyword": "Barbour BEDALE ビデイル",
+        "max_pages": 1,
+        "debug_mode": false,
+        "data_count": 3,
+        "fetch_product_file_selection_mode_auto": true,
+        "suggestion_file_selection_mode_auto": true,
+        "send_to_gchat_file_selection_mode_auto": true
     }
 }

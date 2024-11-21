@@ -13,7 +13,7 @@ from datetime import datetime
 from selenium.webdriver.common.action_chains import ActionChains
 
 # JSONファイルからカテゴリー、検索キーワード、ページ数、デバッグモードを読み込む
-with open('../../config/FSS_setting.json', 'r', encoding='utf-8') as file:
+with open('../../config/FSS_config/FSS_setting.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
     main_category = data["main_category"]
     sub_category = data["sub_category"]

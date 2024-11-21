@@ -8,7 +8,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
 
 # 設定ファイルのパス
-config_path = '../../config/FSS_setting.json'
+config_path = '../../config/FSS_config/FSS_setting.json'
 
 # 設定ファイルの読み込み
 with open(config_path, 'r', encoding='utf-8') as config_file:

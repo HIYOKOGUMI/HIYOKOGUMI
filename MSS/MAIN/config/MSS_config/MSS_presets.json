@@ -102,5 +102,83 @@
             0.2
         ],
         "generate_distribution_chart_file_selection_mode_auto": true
+    },
+    "アークテリクス　ベータLTジャケット": {
+        "main_category": "ファッション",
+        "sub_category": "メンズ",
+        "sub_sub_category": "ジャケット・アウター",
+        "sub_sub_sub_category": "マウンテンパーカー",
+        "sub_sub_sub_sub_category": "",
+        "brand": "アークテリクス",
+        "search_keyword": "アークテリクス　ベータLTジャケット",
+        "max_pages": 9,
+        "debug_mode": false,
+        "data_count": 1080,
+        "fetch_product_file_selection_mode_auto": true,
+        "detect_outliers_file_selection_mode_auto": true,
+        "detect_outliers_file_data_cleaning_mode": "IQR_based",
+        "detect_outliers_file_data_cleaning_mini": 0,
+        "detect_outliers_file_data_cleaning_max": 0,
+        "statistics_file_selection_mode_auto": true,
+        "statistics_file_discount_rates": [
+            0.02,
+            0.05,
+            0.1,
+            0.15,
+            0.25
+        ],
+        "generate_distribution_chart_file_selection_mode_auto": true
+    },
+    "アークテリクス　アトムLTフーディ": {
+        "main_category": "ファッション",
+        "sub_category": "メンズ",
+        "sub_sub_category": "ジャケット・アウター",
+        "sub_sub_sub_category": "ナイロンジャケット",
+        "sub_sub_sub_sub_category": "",
+        "brand": "アークテリクス",
+        "search_keyword": "アークテリクス　アトムLTフーディ",
+        "max_pages": 9,
+        "debug_mode": false,
+        "data_count": 1080,
+        "fetch_product_file_selection_mode_auto": true,
+        "detect_outliers_file_selection_mode_auto": true,
+        "detect_outliers_file_data_cleaning_mode": "IQR_based",
+        "detect_outliers_file_data_cleaning_mini": 0,
+        "detect_outliers_file_data_cleaning_max": 0,
+        "statistics_file_selection_mode_auto": true,
+        "statistics_file_discount_rates": [
+            0.02,
+            0.05,
+            0.1,
+            0.15,
+            0.25
+        ],
+        "generate_distribution_chart_file_selection_mode_auto": true
+    },
+    "ザ・ノース・フェイス マウンテンライトジャケット": {
+        "main_category": "ファッション",
+        "sub_category": "メンズ",
+        "sub_sub_category": "ジャケット・アウター",
+        "sub_sub_sub_category": "マウンテンパーカー",
+        "sub_sub_sub_sub_category": "",
+        "brand": "ザノースフェイス",
+        "search_keyword": "ザ・ノース・フェイス マウンテンライトジャケット",
+        "max_pages": 9,
+        "debug_mode": false,
+        "data_count": 1080,
+        "fetch_product_file_selection_mode_auto": true,
+        "detect_outliers_file_selection_mode_auto": true,
+        "detect_outliers_file_data_cleaning_mode": "IQR_based",
+        "detect_outliers_file_data_cleaning_mini": 0,
+        "detect_outliers_file_data_cleaning_max": 0,
+        "statistics_file_selection_mode_auto": true,
+        "statistics_file_discount_rates": [
+            0.02,
+            0.05,
+            0.1,
+            0.15,
+            0.25
+        ],
+        "generate_distribution_chart_file_selection_mode_auto": true
     }
 }

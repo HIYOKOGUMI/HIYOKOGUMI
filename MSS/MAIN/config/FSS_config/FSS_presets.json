@@ -58,5 +58,35 @@
         "fetch_product_file_selection_mode_auto": true,
         "suggestion_file_selection_mode_auto": true,
         "send_to_gchat_file_selection_mode_auto": true
+    },
+    "アークテリクス　アトムLTフーディ": {
+        "main_category": "ファッション",
+        "sub_category": "メンズ",
+        "sub_sub_category": "ジャケット・アウター",
+        "sub_sub_sub_category": "ナイロンジャケット",
+        "sub_sub_sub_sub_category": "",
+        "brand": "アークテリクス",
+        "search_keyword": "アークテリクス　アトムLTフーディ",
+        "max_pages": 9,
+        "debug_mode": false,
+        "data_count": 1080,
+        "fetch_product_file_selection_mode_auto": true,
+        "suggestion_file_selection_mode_auto": true,
+        "send_to_gchat_file_selection_mode_auto": true
+    },
+    "アークテリクス　ベータLTジャケット": {
+        "main_category": "ファッション",
+        "sub_category": "メンズ",
+        "sub_sub_category": "ジャケット・アウター",
+        "sub_sub_sub_category": "マウンテンパーカー",
+        "sub_sub_sub_sub_category": "",
+        "brand": "",
+        "search_keyword": "アークテリクス　ベータLTジャケット",
+        "max_pages": 9,
+        "debug_mode": false,
+        "data_count": 1080,
+        "fetch_product_file_selection_mode_auto": true,
+        "suggestion_file_selection_mode_auto": true,
+        "send_to_gchat_file_selection_mode_auto": true
     }
 }

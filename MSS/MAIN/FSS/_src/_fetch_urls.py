@@ -36,7 +36,7 @@ driver = webdriver.Chrome(service=Service(driver_path), options=options)
 # メルカリの検索ページを開く
 url = 'https://jp.mercari.com/search'
 driver.get(url)
-wait = WebDriverWait(driver, 10)
+wait = WebDriverWait(driver, 20)
 
 # ステップ1: 「絞り込み」ボタンをクリック
 try:

@@ -9,7 +9,7 @@ base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 data_dir = os.path.join(base_dir, 'data')
 cleaned_dir = os.path.join(data_dir, 'cleaned')
 statistics_dir = os.path.join(data_dir, 'statistics')
-config_file_path = os.path.abspath(os.path.join(base_dir, '..', 'config', 'MSS_config','MSS_setting.json'))
+config_file_path = os.path.abspath(os.path.join(base_dir, '..', 'config', 'MSS_config', 'MSS_setting.json'))
 
 # 統計ディレクトリが存在しない場合は作成
 if not os.path.exists(statistics_dir):
@@ -42,8 +42,8 @@ input_file_path = os.path.join(cleaned_dir, latest_file)
 output_file_name = latest_file.replace('cleaned', 'statistics').replace('.csv', '.xlsx')
 output_file_path = os.path.join(statistics_dir, output_file_name)
 
-# 割引後のCSV出力ファイルのパスを設定
-discount_output_file_path = output_file_path.replace('.xlsx', '_discount.csv')
+# 平均値のみのCSV出力ファイルのパスを設定
+average_output_file_path = output_file_path.replace('.xlsx', '_average.csv')
 
 # データの読み込み
 data = pd.read_csv(input_file_path)
@@ -53,9 +53,6 @@ filtered_data = data[data['outlier_flag'] == False]
 
 # 条件ごとの集計
 results = {}
-median_data = {}
-
-# 指定の順番で条件リストを設定
 condition_order = [
     "新品、未使用", "未使用に近い", "目立った傷や汚れなし", 
     "やや傷や汚れあり", "傷や汚れあり", "全体的に状態が悪い", "エラー"
@@ -76,9 +73,14 @@ for condition in condition_order:
             'median': median_price,
             'mean': mean_price
         }
-
-        # 中央値データを辞書に追加
-        median_data[condition] = median_price if not np.isnan(median_price) else 0  # NaNの場合は0に設定
+    else:
+        # 該当データがない場合
+        results[condition] = {
+            'top_5_max': pd.DataFrame(),
+            'top_5_min': pd.DataFrame(),
+            'median': 0,
+            'mean': 0
+        }
 
 # エラーURLの収集
 error_urls = data[data['outlier_flag'] == True][['url']]
@@ -86,70 +88,44 @@ error_urls = data[data['outlier_flag'] == True][['url']]
 # Excelファイルの書き出し
 with pd.ExcelWriter(output_file_path) as writer:
     for condition in condition_order:
-        if condition in results:
-            stats = results[condition]
-            
-            # 各セクションを作成し空行を挟んでまとめる
-            top_5_max = stats['top_5_max'].assign(Category='Top 5 Max')
-            top_5_min = stats['top_5_min'].assign(Category='Top 5 Min')
-            median_df = pd.DataFrame([{'condition': condition, 'price': stats['median'], 'Category': 'Median'}])
-            mean_df = pd.DataFrame([{'condition': condition, 'price': stats['mean'], 'Category': 'Mean'}])
+        stats = results[condition]
 
-            # 空のDataFrameを挟んで結合
-            condition_df = pd.concat([
-                top_5_max, pd.DataFrame(),  # 空行後にTop 5 Max
-                top_5_min, pd.DataFrame(),  # 空行後にTop 5 Min
-                median_df, pd.DataFrame(),  # 空行後にMedian
-                mean_df
-            ], ignore_index=True)
-        else:
-            # 該当データがない場合は空のDataFrameを用意
-            condition_df = pd.DataFrame(columns=['name', 'price', 'condition', 'posted_date', 'url', 'Category'])
+        # 各セクションを作成
+        top_5_max = stats['top_5_max'].assign(Category='Top 5 Max')
+        top_5_min = stats['top_5_min'].assign(Category='Top 5 Min')
+        median_df = pd.DataFrame([{'condition': condition, 'price': stats['median'], 'Category': 'Median'}])
+        mean_df = pd.DataFrame([{'condition': condition, 'price': stats['mean'], 'Category': 'Mean'}])
 
-        # シートに書き込み
+        # 空行用のDataFrameを作成
+        empty_row = pd.DataFrame([{}])
+
+        # 結合してシートに書き込み
+        condition_df = pd.concat([
+            top_5_max, empty_row, 
+            top_5_min, empty_row, 
+            median_df, empty_row, 
+            mean_df
+        ], ignore_index=True)
         condition_df.to_excel(writer, sheet_name=condition, index=False)
 
     # エラーシート
     if not error_urls.empty:
         error_urls.to_excel(writer, sheet_name="エラー", index=False)
     else:
-        # エラーがない場合でもシートを作成
         empty_error_df = pd.DataFrame(columns=['url'])
         empty_error_df.to_excel(writer, sheet_name="エラー", index=False)
 
-# 割引率の設定を設定ファイルから取得、存在しない場合はエラーメッセージを表示して終了
-if "statistics_file_discount_rates" in config:
-    discount_rates = config["statistics_file_discount_rates"]
-else:
-    print("エラー: 設定ファイルに 'statistics_file_discount_rates' が見つかりません。")
-    sys.exit(1)  # スクリプトを終了
+# 平均値データの作成
+average_data = [
+    {'状態': condition, '平均値': round(results[condition]['mean']) if not np.isnan(results[condition]['mean']) else 0}
+    for condition in condition_order
+]
 
-# 割引データの作成
-discount_data = []
+# 平均値データをDataFrameに変換
+average_df = pd.DataFrame(average_data)
 
-for rate in discount_rates:
-    discount_row = {'割合': f'{int(rate * 100)}%'}
-    for condition in condition_order:
-        # 各条件の中央値を取得し、存在しない場合は0を設定
-        median_price = median_data.get(condition, 0)
-        # 割引価格を計算し、整数に丸め込み
-        discount_price = round(median_price * (1 - rate))
-        discount_row[condition] = discount_price
-    discount_data.append(discount_row)
-
-# 割引データをDataFrameに変換
-discount_df = pd.DataFrame(discount_data)
-
-# カラムが不足している場合、condition_orderに基づき調整
-missing_columns = [condition for condition in condition_order if condition not in discount_df.columns]
-for column in missing_columns:
-    discount_df[column] = 0  # 存在しないカラムには0を設定
-
-# カラム順を固定
-discount_df = discount_df[['割合'] + condition_order]
-
-# 指定のファイルに保存
-discount_df.to_csv(discount_output_file_path, index=False, encoding='utf-8-sig')
+# 平均値データをCSVに保存
+average_df.to_csv(average_output_file_path, index=False, encoding='utf-8-sig')
 
 print(f"処理が完了しました。結果は {output_file_path} に保存されています。")
-print(f"割合金額データは {discount_output_file_path} に保存されています。")
+print(f"平均値データは {average_output_file_path} に保存されています。")

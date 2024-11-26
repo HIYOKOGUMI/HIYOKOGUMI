@@ -45,16 +45,17 @@ output_file_base = os.path.basename(output_file)
 output_suffix = output_file_base.split("output_")[1]  # "yyyy_mm_dd_hh_mm_アークテリクス"を取得
 output_suffix = "_".join(output_suffix.split("_")[5:])  # "アークテリクス"以降の文字列を抽出
 
+# 出力ファイル名の設定
+timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M")
+output_file_base_with_suffix = f"suggestion_5_{output_file_base.rsplit('.', 1)[0]}_{timestamp}.xlsx"
+output_excel_file = os.path.join(suggestion_base_dir, output_file_base_with_suffix)
+
 # データの読み込み
 statistics_df = pd.read_csv(statistics_file, encoding='utf-8')
 output_df = pd.read_csv(output_file, encoding='utf-8')
 
 # outputファイルのprice列に含まれるカンマを削除して数値型に変換
 output_df['price'] = pd.to_numeric(output_df['price'].replace({',': ''}, regex=True), errors='coerce')
-
-# 出力ファイル名の設定
-timestamp = datetime.now().strftime("%Y_%m_%d_%H_%M")
-output_excel_file = os.path.join(suggestion_base_dir, f"suggestion_5_output_{timestamp}.xlsx")
 
 # データフレームリスト（割引率ごとの分類結果を格納）
 dataframes = {f"{int(rate * 100)}%_{output_suffix}": [] for rate in discount_rates}

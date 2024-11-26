@@ -11,7 +11,7 @@ directory_path = '../../_data/f_suggestion'
 config_path = '../../../config/FSS_config/FSS_setting.json'
 
 # Webhook URLの読み込み
-def load_webhook_url(filename="dev_url.txt"): #本番環境のときはurl.txtに変更、この設定はconfigファイルに移動予定
+def load_webhook_url(filename="dev_url.txt"):  # 本番環境のときはurl.txtに変更、この設定はconfigファイルに移動予定
     with open(filename, "r") as file:
         url = file.readline().strip()
     return url
@@ -20,10 +20,10 @@ def load_webhook_url(filename="dev_url.txt"): #本番環境のときはurl.txt�
 def send_message_to_google_chat(message):
     webhook_url = load_webhook_url()
     headers = {"Content-Type": "application/json"}
-    modified_message = re.sub(r"(https?://\S+)", r"\1\n", message)  # URLの後に改行を追加
+    modified_message = re.sub(r"(https?://\S+)", r"\1\n\n", message)  # URLの後に改行を追加
     payload = {"text": modified_message}
     response = requests.post(webhook_url, headers=headers, data=json.dumps(payload))
-    
+
     if response.status_code == 200:
         print("メッセージ送信成功")
     else:
@@ -31,12 +31,13 @@ def send_message_to_google_chat(message):
 
 # 最新のファイルを取得する関数
 def get_latest_file(directory, prefix):
-    pattern = re.compile(rf"{prefix}(\d{{4}}_\d{{2}}_\d{{2}}_\d{{2}}_\d{{2}})_output_\d{{4}}_\d{{2}}_\d{{2}}_\d{{2}}_\d{{2}}.*\.xlsx")
+    # ファイル名の最後の日付部分を抽出する正規表現パターン
+    pattern = re.compile(rf"{prefix}.*?_(\d{{4}}_\d{{2}}_\d{{2}}_\d{{2}}_\d{{2}})\.xls[zx]$")
     latest_file = None
     latest_date = None
 
     for filename in os.listdir(directory):
-        match = pattern.match(filename)
+        match = pattern.search(filename)
         if match:
             file_date_str = match.group(1)
             file_date = datetime.strptime(file_date_str, "%Y_%m_%d_%H_%M")
@@ -55,6 +56,22 @@ def load_auto_mode_from_config(config_path):
     except Exception as e:
         print(f"設定ファイルの読み込みエラー: {e}")
         return True
+
+# 処理するシート名の条件を満たすものを抽出
+def process_sheets(file_path):
+    # Excelファイルの読み込み
+    excel_data = pd.ExcelFile(file_path)
+    # 条件：シート名に '%' を含む
+    target_sheets = [sheet for sheet in excel_data.sheet_names if '%' in sheet]
+    
+    for sheet_name in target_sheets:
+        df = pd.read_excel(file_path, sheet_name=sheet_name)
+        # データフレームの内容をメッセージ形式に変換
+        text_representation = df.apply(lambda x: ' | '.join(x.astype(str)), axis=1)
+        text_content = '\n'.join(text_representation)
+        # Google Chatへ送信
+        send_message_to_google_chat(f"{sheet_name} シートの内容:\n\n{text_content}")
+        time.sleep(1)  # リクエスト制限回避
 
 # メイン処理
 file_prefix = "suggestion_5_output_"
@@ -75,15 +92,7 @@ if latest_file_name:
     # 最初に参照ファイル名をGoogle Chatに送信
     send_message_to_google_chat(f"参照ファイル: {latest_file_name}")
 
-    excel_data = pd.read_excel(file_path, sheet_name=None)
-
-    # 各シートを処理してGoogle Chatへ送信
-    for sheet_name in ["★", "★★", "★★★", "★★★★", "★★★★★"]:
-        if sheet_name in excel_data:
-            df = excel_data[sheet_name]
-            text_representation = df.apply(lambda x: ' | '.join(x.astype(str)), axis=1)
-            text_content = '\n'.join(text_representation)
-            send_message_to_google_chat(f"{sheet_name}シートの内容:\n{text_content}")
-            time.sleep(1)  # リクエスト制限回避
+    # シートを処理
+    process_sheets(file_path)
 else:
     print("指定されたファイルが見つかりませんでした。")

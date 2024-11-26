@@ -71,6 +71,10 @@ else:
 if latest_file_name:
     # ファイルのパス
     file_path = os.path.join(directory_path, latest_file_name)
+
+    # 最初に参照ファイル名をGoogle Chatに送信
+    send_message_to_google_chat(f"参照ファイル: {latest_file_name}")
+
     excel_data = pd.read_excel(file_path, sheet_name=None)
 
     # 各シートを処理してGoogle Chatへ送信

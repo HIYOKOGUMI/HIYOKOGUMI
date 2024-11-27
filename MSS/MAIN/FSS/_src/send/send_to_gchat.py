@@ -72,7 +72,7 @@ def process_sheets(file_path):
         # Google Chatへ送信
         send_message_to_google_chat(f"{sheet_name} シートの内容:\n\n{text_content}")
         time.sleep(1)  # リクエスト制限回避
-
+    send_message_to_google_chat("END\nEND\nEND\nEND\nEND\nEND")
 # メイン処理
 file_prefix = "suggestion_5_output_"
 auto_mode = load_auto_mode_from_config(config_path)

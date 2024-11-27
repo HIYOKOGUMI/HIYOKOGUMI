@@ -3,6 +3,10 @@ import matplotlib.pyplot as plt
 import glob
 import os
 import json
+from matplotlib import rcParams
+
+# 日本語フォントの設定
+rcParams['font.family'] = 'Meiryo'  # 日本語対応フォントを指定
 
 # MSS_setting.jsonの読み込み
 with open('../../config/MSS_config/MSS_setting.json', 'r', encoding='utf-8') as f:
@@ -81,9 +85,9 @@ output_path_sorted_bar = os.path.join(sub_folder, f"{base_filename}_sorted_bar.p
 
 plt.figure(figsize=(10, 8))
 plt.bar(data_filtered_sorted.index, data_filtered_sorted['price'], color=colors, width=1.0)
-plt.xlabel('商品 (安い順にソート)')
-plt.ylabel('金額')
-plt.title('価格分布 (安い順)')
+plt.xlabel('Products minimum sort')
+plt.ylabel('price')
+plt.title('Price Distribution by minimum sort')
 plt.grid(True, axis='y')
 plt.savefig(output_path_sorted_bar)
 plt.close()
@@ -101,9 +105,9 @@ for condition, color in color_map.items():
         plt.figure(figsize=(10, 8))
         plt.bar(condition_data.index, condition_data['price'], color=color, width=1.0)
         plt.xlim(0, len(condition_data) - 1)  # 横軸をその状態のデータ数に合わせる
-        plt.xlabel('商品 (安い順にソート)')
-        plt.ylabel('金額')
-        plt.title(f'価格分布 ({condition})')
+        plt.xlabel('Products(minimum sort)')
+        plt.ylabel('Price')
+        plt.title(f'Price Distribution by {condition}')
         plt.grid(True, axis='y')
         plt.savefig(output_path_condition_bar)
         plt.close()

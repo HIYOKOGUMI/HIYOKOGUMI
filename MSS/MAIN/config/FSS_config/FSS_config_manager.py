@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import json
+import re
 from collections import OrderedDict
 
 # 保存するJSONデータの初期形式（順序を明確に定義）
@@ -16,6 +17,7 @@ default_data = OrderedDict([
     ("data_count", 0),
     ("fetch_product_file_selection_mode_auto", True),
     ("suggestion_file_selection_mode_auto", True),
+    ("suggestion_file_discount_rates", [0.3, 0.25, 0.2, 0.15, 0.1]),  # リスト型データ
     ("send_to_gchat_file_selection_mode_auto", True)
 ])
 
@@ -27,13 +29,8 @@ settings_file = "FSS_setting.json"
 def load_presets():
     try:
         with open(preset_file, 'r', encoding='utf-8') as file:
-            data = file.read().strip()  # ファイル内容を読み取る
-            if not data:  # ファイルが空の場合
-                raise ValueError("プリセットファイルが空です")
-            return json.loads(data, object_pairs_hook=OrderedDict)
-    except (FileNotFoundError, ValueError):
-        # ファイルが存在しない、または空の場合は初期データを作成
-        save_presets(OrderedDict({"default": default_data}))
+            return json.load(file, object_pairs_hook=OrderedDict)
+    except FileNotFoundError:
         return OrderedDict({"default": default_data})
 
 # プリセットを保存する
@@ -46,6 +43,22 @@ def save_settings(settings):
     with open(settings_file, 'w', encoding='utf-8') as file:
         json.dump(settings, file, indent=4, ensure_ascii=False, sort_keys=False)
 
+# 値をリストに変換する際の処理
+def parse_list(value):
+    try:
+        # 不要な文字列（丸括弧など）を削除
+        value = value.replace("(", "").replace(")", "").replace("[", "").replace("]", "").strip()
+
+        # 正規表現でリスト形式をチェック
+        if not re.match(r'^(\s*\d+(\.\d+)?\s*,?)+$', value):
+            raise ValueError(f"リストの形式が正しくありません: {value}")
+
+        # リストとして変換
+        return [float(x.strip()) for x in value.split(",") if x.strip()]
+    except ValueError as e:
+        sg.popup_error(f"リストの形式が正しくありません: {value}\nエラー: {e}")
+        return None
+
 # GUIを使って編集
 def edit_json():
     # プリセットを読み込む
@@ -53,11 +66,18 @@ def edit_json():
     current_preset = "default"
     current_data = presets[current_preset].copy()  # デフォルトのデータをコピーして使用
 
+    # current_data に存在しないキーをデフォルト値で補完
+    for key, default_value in default_data.items():
+        if key not in current_data:
+            current_data[key] = default_value
+
     # GUIのレイアウトを作成
     layout = []
     for key, value in default_data.items():
         if isinstance(value, bool):
             layout.append([sg.Text(key), sg.Checkbox("", default=current_data[key], key=key)])
+        elif isinstance(value, list):
+            layout.append([sg.Text(key), sg.InputText(", ".join(map(str, current_data[key])), key=key)])
         else:
             layout.append([sg.Text(key), sg.InputText(current_data[key], key=key)])
 
@@ -78,6 +98,12 @@ def edit_json():
                     current_data[key] = values[key]  # Checkboxの値をTrue/Falseとして保存
                 elif isinstance(default_data[key], int):
                     current_data[key] = int(values[key])
+                elif isinstance(default_data[key], float):
+                    current_data[key] = float(values[key])
+                elif isinstance(default_data[key], list):
+                    parsed_list = parse_list(values[key])
+                    if parsed_list is not None:
+                        current_data[key] = parsed_list
                 else:
                     current_data[key] = values[key]
             save_settings(current_data)  # 設定ファイルを保存
@@ -94,6 +120,12 @@ def edit_json():
                         new_preset[key] = values[key]
                     elif isinstance(default_data[key], int):
                         new_preset[key] = int(values[key])
+                    elif isinstance(default_data[key], float):
+                        new_preset[key] = float(values[key])
+                    elif isinstance(default_data[key], list):
+                        parsed_list = parse_list(values[key])
+                        if parsed_list is not None:
+                            new_preset[key] = parsed_list
                     else:
                         new_preset[key] = values[key]
                 presets[preset_name] = new_preset
@@ -106,7 +138,8 @@ def edit_json():
             if selected_preset in presets:
                 current_data = presets[selected_preset]
                 for key in default_data.keys():
-                    window[key].update(current_data[key])
+                    if key in current_data:
+                        window[key].update(current_data[key])
 
     window.close()
 

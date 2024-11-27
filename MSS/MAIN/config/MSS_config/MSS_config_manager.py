@@ -1,6 +1,5 @@
 import PySimpleGUI as sg
 import json
-import re
 from collections import OrderedDict
 
 # 保存するJSONデータの初期形式（順序を明確に定義）
@@ -21,7 +20,6 @@ default_data = OrderedDict([
     ("detect_outliers_file_data_cleaning_mini", 0),
     ("detect_outliers_file_data_cleaning_max", 0),
     ("statistics_file_selection_mode_auto", True),
-    ("statistics_file_discount_rates", [0.02, 0.05, 0.1, 0.15, 0.2]),
     ("generate_distribution_chart_file_selection_mode_auto", True)
 ])
 
@@ -47,22 +45,6 @@ def save_settings(settings):
     with open(settings_file, 'w', encoding='utf-8') as file:
         json.dump(settings, file, indent=4, ensure_ascii=False, sort_keys=False)
 
-# 値をリストに変換する際の処理
-def parse_list(value):
-    try:
-        # 不要な文字列（丸括弧など）を削除
-        value = value.replace("(", "").replace(")", "").replace("[", "").replace("]", "").strip()
-
-        # 正規表現でリスト形式をチェック
-        if not re.match(r'^(\s*\d+(\.\d+)?\s*,?)+$', value):
-            raise ValueError(f"リストの形式が正しくありません: {value}")
-
-        # リストとして変換
-        return [float(x.strip()) for x in value.split(",") if x.strip()]
-    except ValueError as e:
-        sg.popup_error(f"リストの形式が正しくありません: {value}\nエラー: {e}")
-        return None
-
 # GUIを使って編集
 def edit_json():
     # プリセットを読み込む
@@ -70,13 +52,16 @@ def edit_json():
     current_preset = "default"
     current_data = presets[current_preset].copy()  # デフォルトのデータをコピーして使用
 
+    # current_data に存在しないキーをデフォルト値で補完
+    for key, default_value in default_data.items():
+        if key not in current_data:
+            current_data[key] = default_value
+
     # GUIのレイアウトを作成
     layout = []
     for key, value in default_data.items():
         if isinstance(value, bool):
             layout.append([sg.Text(key), sg.Checkbox("", default=current_data[key], key=key)])
-        elif isinstance(value, list):
-            layout.append([sg.Text(key), sg.InputText(", ".join(map(str, current_data[key])), key=key)])
         else:
             layout.append([sg.Text(key), sg.InputText(current_data[key], key=key)])
 
@@ -84,7 +69,7 @@ def edit_json():
     layout.append([sg.Button("保存"), sg.Button("プリセット登録して保存"), sg.Button("終了")])
 
     # ウィンドウを表示
-    window = sg.Window("JSON Editor", layout)
+    window = sg.Window("MSS Config Manager", layout)
 
     while True:
         event, values = window.read()
@@ -99,10 +84,6 @@ def edit_json():
                     current_data[key] = int(values[key])
                 elif isinstance(default_data[key], float):
                     current_data[key] = float(values[key])
-                elif isinstance(default_data[key], list):
-                    parsed_list = parse_list(values[key])
-                    if parsed_list is not None:
-                        current_data[key] = parsed_list
                 else:
                     current_data[key] = values[key]
             save_settings(current_data)  # 設定ファイルを保存
@@ -121,10 +102,6 @@ def edit_json():
                         new_preset[key] = int(values[key])
                     elif isinstance(default_data[key], float):
                         new_preset[key] = float(values[key])
-                    elif isinstance(default_data[key], list):
-                        parsed_list = parse_list(values[key])
-                        if parsed_list is not None:
-                            new_preset[key] = parsed_list
                     else:
                         new_preset[key] = values[key]
                 presets[preset_name] = new_preset
@@ -137,7 +114,8 @@ def edit_json():
             if selected_preset in presets:
                 current_data = presets[selected_preset]
                 for key in default_data.keys():
-                    window[key].update(current_data[key])
+                    if key in current_data:
+                        window[key].update(current_data[key])
 
     window.close()
 

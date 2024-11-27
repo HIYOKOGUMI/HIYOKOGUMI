@@ -1,12 +1,16 @@
 import pandas as pd
 import os
 import re
+import json
 from datetime import datetime
 from openpyxl.utils import get_column_letter
 from openpyxl import Workbook
 
-# 割引率リスト（多い順）
-discount_rates = [0.25, 0.20, 0.15, 0.10, 0.05]
+# 割引率リストを設定ファイルから取得
+config_path = '../../config/FSS_config/FSS_setting.json'
+with open(config_path, 'r', encoding='utf-8') as config_file:
+    config = json.load(config_file)
+discount_rates = config.get("suggestion_file_discount_rates", [0.05, 0.04, 0.03, 0.02, 0.01])
 
 # ファイルパスの設定（元の構成を維持）
 statistics_dir = '../../MSS/data/statistics'
